@@ -9,5 +9,7 @@ rm -f foundation-5.1.1.zip public/index.html
 git clone https://github.com/afl-eafit/2015-2-lab1.git
 
 #Build
+cabal sandbox init
 cabal install --dependencies-only
+cabal install quickcheck
 cabal build
