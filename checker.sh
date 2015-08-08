@@ -2,9 +2,9 @@
 
 BASE_LIB=2015-2-lab1/src/
 DIR=data/${1}
+DB=.cabal-sandbox/x86_64-linux-ghc-7.10.1-packages.conf.d/
 
 exec > data/${1}/check.html
-
 cat <<EOF
 <!doctype html>
 <!--[if IE 9]><html class="lt-ie10" lang="en" > <![endif]-->
@@ -53,24 +53,40 @@ cat <<EOF
     </div>
     <div class="large-12 columns">
       <div class="panel">
+      <pre>
 EOF
 
 cat ${DIR}/ghc.log | sed "s|${DIR}||"
-
+echo "</pre>"
 echo "</div>"
 
 else
 
 cat <<EOF
       <h3> Tests </h3>
+      <hr/>
     </div>
-    <div class="large-12 columns">
 EOF
+
+runhaskell -i${BASE_LIB} \
+           -i${DIR} \
+           -package-db --ghc-arg=${DB} \
+           test/Main.hs 2> ${DIR}/run.log
+
+if [ $? -ne 0 ]
+then
+    echo "<div class=\"large-12 columns\">"
+    echo "<div class=\"panel\">"
+    echo "<pre>"
+    cat ${DIR}/run.log  | sed "s|${DIR}||"
+    echo "</pre>"
+    echo "</div>"
+    echo "</div>"
+fi
 
 fi
 
 cat <<EOF
-    </div>
     </div>
   </body>
 </html>
