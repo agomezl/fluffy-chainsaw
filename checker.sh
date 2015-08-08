@@ -2,7 +2,8 @@
 
 BASE_LIB=2015-2-lab1/src/
 DIR=data/${1}
-DB=.cabal-sandbox/x86_64-linux-ghc-*-packages.conf.d/
+GHC_VERSION=$(ls .cabal-sandbox/ | grep x86_64)
+DB=.cabal-sandbox/${GHC_VERSION}/
 
 exec > data/${1}/check.html
 cat <<EOF
