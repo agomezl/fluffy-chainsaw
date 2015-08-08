@@ -2,7 +2,7 @@
 
 BASE_LIB=2015-2-lab1/src/
 DIR=data/${1}
-DB=.cabal-sandbox/x86_64-linux-ghc-7.10.1-packages.conf.d/
+DB=.cabal-sandbox/x86_64-linux-ghc-*-packages.conf.d/
 
 exec > data/${1}/check.html
 cat <<EOF
