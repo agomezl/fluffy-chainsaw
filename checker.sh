@@ -64,7 +64,13 @@ echo "</div>"
 else
 
 cat <<EOF
-      <h3> Tests </h3>
+      <h3 style="text-align:left;float:left;"> Tests
+      <h5 style="text-align:right;float:right;">
+         [<a href="https://github.com/afl-eafit/2015-2-lab1/blob/master/src/Data/Automata/AFA/Examples.hs">
+         Source code
+         </a>]
+      </h5>
+      </h3>
       <hr/>
     </div>
 EOF
