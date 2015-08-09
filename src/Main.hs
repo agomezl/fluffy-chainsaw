@@ -39,4 +39,4 @@ main = do
                     [] → error "no file uploaded"
                     ((_,_data):_) → if fileName _data  == "SimAFA.hs"
                                     then checkData _data >>= file
-                                    else liftIO . print . fileName $ _data
+                                    else file "views/filename.html"
