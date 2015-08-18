@@ -1,11 +1,15 @@
 #!/bin/bash
 
+#Variables
 BASE_LIB=2015-2-lab1/src/
 DIR=data/${1}
 GHC_VERSION=$(ls .cabal-sandbox/ | grep x86_64)
 DB=.cabal-sandbox/${GHC_VERSION}/
 
+#Redirect STDIN to a file (Script wide)
 exec > data/${1}/check.html
+
+#HTML header
 cat <<EOF
 <!doctype html>
 <!--[if IE 9]><html class="lt-ie10" lang="en" > <![endif]-->
@@ -36,8 +40,9 @@ cat <<EOF
      <div class="panel">
 EOF
 
+#The submitted file
 echo "<pre>"
-cat data/${1}/SimAFA.hs
+cat ${DIR}/SimAFA.hs
 echo "</pre>"
 
 cat <<EOF
@@ -46,8 +51,11 @@ cat <<EOF
     <div class="large-12 columns">
 EOF
 
+#Check for compilation errors
 if ! (ghc ${DIR}/SimAFA.hs -i${BASE_LIB} > ${DIR}/ghc.log 2>&1)
 then
+
+#If errors were found, print them
 
 cat <<EOF
       <h3> Compilation Error </h3>
@@ -62,6 +70,7 @@ echo "</pre>"
 echo "</div>"
 
 else
+#If no error were found run tests
 
 cat <<EOF
       <h3 style="text-align:left;float:left;"> Tests
@@ -75,11 +84,13 @@ cat <<EOF
     </div>
 EOF
 
+#Interpret SimAFA.hs + AFA.hs + quick check tests + test main
 runhaskell -i${BASE_LIB} \
            -i${DIR} \
            -package-db --ghc-arg=${DB} \
            test/Main.hs 2> ${DIR}/run.log
 
+#Check if test fail for some weird reason
 if [ $? -ne 0 ]
 then
     echo "<div class=\"large-12 columns\">"
@@ -91,9 +102,53 @@ then
     echo "</div>"
 fi
 
+#Start clean code checks
+cat <<EOF
+    <div class="large-12 columns">
+      <h3>Clean code</h3>
+    </div>
+    <div class="large-12 columns">
+    <lu>
+EOF
+
+#80 columns check
+if $(grep -q '.\{81,\}' ${DIR}/SimAFA.hs)
+then
+    echo "<li><p>Your file has more than 80 columns in some lines</p>"
+     echo "<div class=\"panel\"><pre>"
+    grep -n '.\{81,\}' ${DIR}/SimAFA.hs
+    echo "</pre></div></li>"
+fi
+
+#Trailing white spaces check
+if $(grep -q ' $' ${DIR}/SimAFA.hs)
+then
+    echo "<li> <p>Your file has trailing whitespace</p>"
+    echo "<div class=\"panel\"><pre>"
+    grep -n ' $' ${DIR}/SimAFA.hs
+    echo "</pre></div></li>"
+
+fi
+
+#No tabs check
+if $(grep -P -q '\t' ${DIR}/SimAFA.hs)
+then
+    echo "<li> <p>Your file has tabs</p>"
+    echo "<div class=\"panel\"><pre>"
+    grep -P -n '\t' ${DIR}/SimAFA.hs
+    echo "</pre></div></li>"
+fi
+
+if ! $(grep -q 'accepts \+\(∷\|::\)' ${DIR}/SimAFA.hs)
+then
+    echo "<li> <p><tt>accepts</tt> lacks of a type signature.</p>"
+fi
+
 fi
 
 cat <<EOF
+      </lu>
+      </div>
     </div>
   </body>
 </html>
