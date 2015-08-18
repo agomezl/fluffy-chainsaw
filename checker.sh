@@ -103,53 +103,65 @@ then
 fi
 
 #Start clean code checks
-cat <<EOF
-    <div class="large-12 columns">
-      <h3>Clean code</h3>
-    </div>
-    <div class="large-12 columns">
-    <lu>
-EOF
+[ -f ${DIR}/clean.log ] && rm -f ${DIR}/clean.log
 
 #80 columns check
 if $(grep -q '.\{81,\}' ${DIR}/SimAFA.hs)
 then
-    echo "<li><p>Your file has more than 80 columns in some lines</p>"
-     echo "<div class=\"panel\"><pre>"
-    grep -n '.\{81,\}' ${DIR}/SimAFA.hs
-    echo "</pre></div></li>"
+    ( echo "<li><p>Your file has more than 80 columns in some lines</p>"
+      echo "<div class=\"panel\"><pre>"
+      grep -n '.\{81,\}' ${DIR}/SimAFA.hs
+      echo "</pre></div></li>" ) >> ${DIR}/clean.log
 fi
 
 #Trailing white spaces check
 if $(grep -q ' $' ${DIR}/SimAFA.hs)
 then
-    echo "<li> <p>Your file has trailing whitespace</p>"
-    echo "<div class=\"panel\"><pre>"
-    grep -n ' $' ${DIR}/SimAFA.hs
-    echo "</pre></div></li>"
+    ( echo "<li> <p>Your file has trailing whitespace</p>"
+      echo "<div class=\"panel\"><pre>"
+      grep -n ' $' ${DIR}/SimAFA.hs
+      echo "</pre></div></li>" ) >> ${DIR}/clean.log
 
 fi
 
 #No tabs check
 if $(grep -P -q '\t' ${DIR}/SimAFA.hs)
 then
-    echo "<li> <p>Your file has tabs</p>"
-    echo "<div class=\"panel\"><pre>"
-    grep -P -n '\t' ${DIR}/SimAFA.hs
-    echo "</pre></div></li>"
+    ( echo "<li> <p>Your file has tabs</p>"
+      echo "<div class=\"panel\"><pre>"
+      grep -P -n '\t' ${DIR}/SimAFA.hs
+      echo "</pre></div></li>" ) >> ${DIR}/clean.log
 fi
 
+#Type signature check
 if ! $(grep -q 'accepts \+\(∷\|::\)' ${DIR}/SimAFA.hs)
 then
-    echo "<li> <p><tt>accepts</tt> lacks of a type signature.</p>"
+    echo "<li> <p><tt>accepts</tt> lacks of a type signature.</p>" >> ${DIR}/clean.log
 fi
+
+if [ -f ${DIR}/clean.log ]
+then
+    cat <<EOF
+    <div class="large-12 columns">
+      <h3>Clean code</h3>
+    </div>
+    <div class="large-12 columns">
+    <lu>
+EOF
+    cat ${DIR}/clean.log
+    cat <<EOF
+      </lu>
+      </div>
+EOF
+fi
+
+
 
 fi
 
 cat <<EOF
-      </lu>
-      </div>
     </div>
+    <hr/>
   </body>
 </html>
 EOF
